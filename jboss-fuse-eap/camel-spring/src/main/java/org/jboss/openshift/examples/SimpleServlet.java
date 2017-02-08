@@ -21,7 +21,7 @@ package org.jboss.openshift.examples;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
+import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
@@ -35,7 +35,7 @@ import org.apache.camel.ProducerTemplate;
 @SuppressWarnings("serial")
 @WebServlet(name = "HttpServiceServlet", urlPatterns = {"/*"}, loadOnStartup = 1)
 public class SimpleServlet extends HttpServlet {
-    @Inject
+    @Resource(lookup = "java:jboss/camel/context/hello-camel-context")
     private CamelContext camelctx;
 
     @Override

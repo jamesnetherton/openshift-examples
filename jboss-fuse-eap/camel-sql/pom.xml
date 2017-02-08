@@ -2,7 +2,7 @@
   #%L
 
   %%
-  Copyright (C) 2013 - 2016 RedHat
+  Copyright (C) 2017 RedHat
   %%
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -21,16 +21,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.jboss.openshift.examples</groupId>
-    <artifactId>jboss-fuse-eap-camel-spring</artifactId>
-    <version>6.3.0</version>
+    <artifactId>example-camel-sql</artifactId>
+    <version>1.0.0</version>
     <packaging>war</packaging>
 
-    <name>Openshift Examples :: JBoss Fuse EAP :: Camel Spring</name>
+    <name>Openshift Examples :: JBoss Fuse EAP :: Camel SQL</name>
 
     <!-- Properties -->
     <properties>
         <version.jboss.fuse>6.3.0.redhat-224</version.jboss.fuse>
         <version.jboss.spec.javaee>3.0.2.Final-redhat-15</version.jboss.spec.javaee>
+        <version.maven.compiler.plugin>3.6.0</version.maven.compiler.plugin>
         <version.maven.war.plugin>3.0.0</version.maven.war.plugin>
     </properties>
 
@@ -56,8 +57,28 @@
     <dependencies>
         <!-- Provided -->
         <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.camel</groupId>
-            <artifactId>camel-core</artifactId>
+            <artifactId>camel-cdi</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-servlet</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-sql</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.spec.javax.ejb</groupId>
+            <artifactId>jboss-ejb-api_3.1_spec</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -67,15 +88,24 @@
         </dependency>
     </dependencies>
 
+    <!-- Build -->
     <build>
-        <finalName>example-camel-spring</finalName>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>${version.maven.war.plugin}</version>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${version.maven.compiler.plugin}</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
 </project>

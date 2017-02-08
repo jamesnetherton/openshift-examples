@@ -1,0 +1,92 @@
+<!--
+  #%L
+
+  %%
+  Copyright (C) 2017 RedHat
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jee="http://www.springframework.org/schema/jee"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/jee
+                           http://www.springframework.org/schema/jee/spring-jee.xsd
+                           http://camel.apache.org/schema/spring
+                           http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer" />
+
+    <bean class="org.jboss.openshift.examples.OrderGenerator" id="orderGenerator"/>
+
+    <!-- Look up the ActiveMQ connection factory from JNDI using the value of the MQ_JNDI environment variable -->
+    <jee:jndi-lookup id="connectionFactory" jndi-name="${MQ_JNDI}"/>
+
+    <!-- Configure the Camel ActiveMQ component to use the connection factory -->
+    <bean id="amq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+        <property name="connectionFactory" ref="connectionFactory"/>
+    </bean>
+
+    <camelContext xmlns="http://camel.apache.org/schema/spring" id="hello-camel-context">
+        <!--
+          A route to generate a random order every 5 seconds.
+
+          When this route is started, it will automatically send xml messages to the JMS queue 'incomingOrders' on the
+          ActiveMQ broker.
+
+          The <log/> elements are used to add logging statements. They make it easier to see what the route is doing.
+        -->
+        <route id="generate-order-route" streamCache="true">
+            <from id="route-timer" uri="timer:order?period=3000"/>
+            <bean id="route-new-order" method="generateOrder" ref="orderGenerator"/>
+            <setHeader headerName="Exchange.FILE_NAME" id="route-set-order-header">
+                <!-- defining the header containing a simulated file name -->
+                <method method="generateFileName" ref="orderGenerator"/>
+            </setHeader>
+            <log id="route-log-order" message="Generating order ${file:name}"/>
+            <to id="route-to-incoming-orders" uri="amq:incomingOrders"/>
+        </route>
+
+        <!--
+          This route consumes messages from the JMS queue 'incomingOrders' on the ActiveMQ broker within the OpenShift / Kubernetes cluster.
+
+          The <choice/> element contains the content based router. The two <when/> clauses use XPath to define the criteria
+          for entering that part of the route. When the country in the XML message is set to UK or US, the message will follow
+          the specific rules defined for that country. The <otherwise/> element ensures that any message that does not meet the
+          requirements for either of the <when/> elements will follow another route.
+        -->
+        <route id="jms-cbr-route" streamCache="true">
+            <from id="route-from-incoming-orders" uri="amq:incomingOrders"/>
+            <choice id="route-choose-country">
+                <when id="route-when-uk">
+                    <xpath>/order/customer/country = 'UK'</xpath>
+                    <log id="route-log-uk" message="Sending order ${file:name} to the UK"/>
+                    <!-- Put additional routing rules for UK messages here -->
+                </when>
+                <when id="route-when-us">
+                    <xpath>/order/customer/country = 'US'</xpath>
+                    <log id="route-log-us" message="Sending order ${file:name} to the US"/>
+                    <!-- Put additional routing rules for US messages here -->
+                </when>
+                <otherwise id="route-when-other-country">
+                    <log id="route-log-other" message="Sending order ${file:name} to another country"/>
+                    <!-- Put additional routing rules for other messages here -->
+                </otherwise>
+            </choice>
+            <log id="route-final-log" message="Done processing ${file:name}"/>
+        </route>
+    </camelContext>
+
+</beans>

@@ -1,32 +1,28 @@
-Camel CDI Example
------------------
+# Camel CDI Example
 
-This example demonstrates using the camel-cdi component with JBoss Fuse on EAP to integrate CDI beans with Camel routes.
+This quickstart shows how to configure Camel routes using CDI. The example exposes an HTTP endpoint
+which can be interacted with.
 
-In this example, a Camel route takes a message payload from a servlet HTTP GET request and passes it on to a direct endpoint. The payload
-is then passed onto a Camel CDI bean invocation to produce a message response which is displayed on the web browser page.
+### Building
 
-Browse to http://localhost:8080/example-camel-cdi/?name=Kermit.
+The example can be built with
 
-You should see the message "Hello Kermit" output on the web page.
+    mvn clean install
 
-The Camel route is very simple and looks like this:
+### Running via an S2I Application Template
 
-```
-from("direct:start").bean("helloBean");
-```
+Applicaiton templates allow you deploy applications to OpenShift by filling out a form in the OpenShift console that allows you to adjust deployment parameters.  This template uses an S2I source build so that it handle building and deploying the application for you.
 
-The `bean` DSL makes camel look for a bean named 'helloBean' in the bean registry. The magic that makes this bean
-available to Camel is found in the `SomeBean` class.
+Create the quickstart template:
 
-```java
-@Named("helloBean")
-public class SomeBean {
+    oc create -f quickstart-template.json
 
-    public String someMethod(String message) {
-        return "Hello " + message;
-    }
-}
-```
+Now when you use "Add to Project" button in the OpenShift console, you should see a template for this quickstart.
 
-By using the `@Named` annotation, camel-cdi will add this bean to the Camel bean registry.
+
+### HTTP Endponint
+
+When the quickstart has deployed successfully, you can test it in a web browser by navigating to the following URL:
+
+- <http://my-openshift-host/example-camel-cdi?name=Test>
+ 

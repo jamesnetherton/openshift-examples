@@ -19,21 +19,12 @@
  */
 package org.jboss.openshift.examples;
 
-import javax.ejb.Startup;
-import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
 
-import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.cdi.ContextName;
+@Named("helloBean")
+public class HelloBean {
 
-@Startup
-@ApplicationScoped
-@ContextName("cdi-context")
-public class MyRouteBuilder extends RouteBuilder {
-
-    @Override
-    public void configure() throws Exception {
-    	from("direct:start")
-        .bean("helloBean")
-        .log("${body}");
+    public String someMethod(String message) {
+        return "Hello " + message;
     }
 }

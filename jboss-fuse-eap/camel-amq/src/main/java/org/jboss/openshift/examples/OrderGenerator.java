@@ -2,7 +2,7 @@
  * #%L
  *
  * %%
- * Copyright (C) 2013 - 2016 RedHat
+ * Copyright (C) 2017 RedHat
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,21 @@
  */
 package org.jboss.openshift.examples;
 
-import javax.inject.Named;
+import java.io.InputStream;
+import java.util.Random;
 
-@Named("helloBean")
-public class SomeBean {
+public class OrderGenerator {
 
-    public String someMethod(String message) {
-        return "Hello " + message;
+    private int count = 1;
+    private Random random = new Random();
+
+    public InputStream generateOrder() {
+        int number = random.nextInt(5) + 1;
+        String name = "/data/order" + number + ".xml";
+        return getClass().getResourceAsStream(name);
+    }
+
+    public String generateFileName() {
+        return "order" + count++ + ".xml";
     }
 }

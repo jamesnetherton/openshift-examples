@@ -19,21 +19,20 @@
  */
 package org.jboss.openshift.examples;
 
-import javax.ejb.Startup;
+import javax.annotation.Resource;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
+import javax.inject.Named;
+import javax.sql.DataSource;
 
-import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.cdi.ContextName;
-
-@Startup
 @ApplicationScoped
-@ContextName("cdi-context")
-public class MyRouteBuilder extends RouteBuilder {
+public class DatasourceProducer {
+    @Resource(mappedName = "java:jboss/datasources/sampledb")
+    private DataSource dataSource;
 
-    @Override
-    public void configure() throws Exception {
-    	from("direct:start")
-        .bean("helloBean")
-        .log("${body}");
+    @Produces
+    @Named("datasource")
+    public DataSource getDataSource() {
+        return dataSource;
     }
 }

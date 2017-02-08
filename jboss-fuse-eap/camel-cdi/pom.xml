@@ -2,7 +2,7 @@
   #%L
 
   %%
-  Copyright (C) 2013 - 2016 RedHat
+  Copyright (C) 2017 RedHat
   %%
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -22,24 +22,31 @@
 
     <groupId>org.jboss.openshift.examples</groupId>
     <artifactId>jboss-fuse-eap-camel-cdi</artifactId>
-    <version>6.3.0</version>
+    <version>1.0.0</version>
     <packaging>war</packaging>
 
     <name>Openshift Examples :: JBoss Fuse EAP :: Camel CDI</name>
 
     <!-- Properties -->
     <properties>
-        <version.apache.camel>2.17.0</version.apache.camel>
-        <version.jboss.spec.javaee.6.0>3.0.3.Final</version.jboss.spec.javaee.6.0>
-        <version.maven.war.plugin>2.6</version.maven.war.plugin>
+        <version.jboss.fuse>6.3.0.redhat-224</version.jboss.fuse>
+        <version.jboss.spec.javaee>3.0.2.Final-redhat-15</version.jboss.spec.javaee>
+        <version.maven.war.plugin>3.0.0</version.maven.war.plugin>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>org.jboss.fuse.bom</groupId>
+                <artifactId>jboss-fuse-parent</artifactId>
+                <version>${version.jboss.fuse}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.jboss.spec</groupId>
                 <artifactId>jboss-javaee-6.0</artifactId>
-                <version>${version.jboss.spec.javaee.6.0}</version>
+                <version>${version.jboss.spec.javaee}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -51,7 +58,6 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-cdi</artifactId>
-            <version>${version.apache.camel}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -74,15 +80,11 @@
     <!-- Build -->
     <build>
         <finalName>example-camel-cdi</finalName>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>${version.maven.war.plugin}</version>
-                <configuration>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                </configuration>
             </plugin>
         </plugins>
     </build>
